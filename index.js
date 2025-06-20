@@ -39,7 +39,6 @@ async function run() {
             const result = await jobCollection.find().toArray();
             res.send(result);
         })
-
         app.get('/jobs/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
