@@ -33,7 +33,7 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         const jobCollection = client.db("CareerCrafters").collection("jobs");
-        // const userCollection = client.db("RecipeBookApp").collection("users")
+         const applicationCollection = client.db("CareerCrafters").collection("applications")
 
         app.get('/jobs', async (req, res) => {
             const result = await jobCollection.find().toArray();
@@ -42,14 +42,16 @@ async function run() {
         app.get('/jobs/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
-            const result = await recipeCollection.findOne(query);
+            const result = await jobCollection.findOne(query);
             res.send(result);
         })
-        // app.post('/Recipes', async (req, res) => {
-        //     const newRecipe = req.body;
-        //     const result = await recipeCollection.insertOne(newRecipe);
-        //     res.send(result)
-        // })
+        // job application related API
+
+        app.post('/applications', async (req, res) => {
+            const application = req.body;
+            const result = await applicationCollection.insertOne(application);
+            res.send(result)
+        })
 
         // app.get('/jobs/:id', async (req, res) => {
         //     const id = req.params.id;
