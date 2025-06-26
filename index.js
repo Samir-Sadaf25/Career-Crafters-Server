@@ -95,60 +95,29 @@ async function run() {
       res.send(result);
     });
 
-    // app.delete("/applications/:id", async (req, res) => {
-    //     const id = req.params.id;
-    //     const result = await applicationCollection.deleteOne({ _id: new ObjectId(id) });
-    //     if (result.deletedCount === 1) {
-    //         res.send({ message: "Application removed" });
-    //     } else {
-    //         res.status(404).send({ error: "Application not found" });
-    //     }
-    // });
+    // job post related API
+    app.post("/jobs", async (req, res) => {
+      const jobData = req.body;
+      try {
+        const result = await jobCollection.insertOne({
+          ...jobData,
+          salaryRange: {
+            min: parseInt(jobData.salaryRange.min),
+            max: parseInt(jobData.salaryRange.max),
+          },
+          requirements: jobData.requirements.filter(Boolean),
+          datePosted: jobData.datePosted || new Date().toISOString(),
+        });
 
-    // app.delete("/applications/:jobId", async (req, res) => {
-    //     const jobId = req.params.jobId;
-    //     const userId = req.query.userId;
-
-    //     const result = await applicationCollection.deleteOne({
-    //         jobId,
-    //         userId,
-    //     });
-
-    //     if (result.deletedCount === 1) {
-    //         res.send({ message: "Application withdrawn" });
-    //     } else {
-    //         res.status(404).send({ error: "No matching application found" });
-    //     }
-    // });
-
-    // app.delete('/Recipes/:id', async (req, res) => {
-    //     const id = req.params.id;
-    //     const result = await recipeCollection.deleteOne({ _id: new ObjectId(id) });
-    //     res.send(result);
-    // });
-
-    // app.put('/Recipes/:id', async (req, res) => {
-    //     const id = req.params.id
-    //     const filter = { _id: new ObjectId(id) }
-    //     const options = { upsert: true };
-    //     const updatedRecipe = req.body;
-    //     const updateDoc = {
-    //         $set: updatedRecipe
-    //     };
-    //     const result = await recipeCollection.updateOne(filter, updateDoc, options)
-    //     res.send(result);
-    // })
-
-    // user related API's
-    // app.get('/users', async (req, res) => {
-    //     const result = await userCollection.find().toArray();
-    //     res.send(result);
-    // })
-    // app.post('/users', async (req, res) => {
-    //     const userProfile = req.body;
-    //     const result = await userCollection.insertOne(userProfile);
-    //     res.send(result);
-    // })
+        res.status(201).send({
+          message: "job posted successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Failed to add job:", err);
+        res.status(500).send({ error: "Internal server error" });
+      }
+    });
   } finally {
     // Ensures that the client will close when you finish/error
   }
