@@ -66,10 +66,10 @@ async function run() {
         .find({ userId })
         .toArray();
       console.log(applications);
-      
+
       // Step 2: Extract all jobIds from them
       const jobIds = applications.map((app) => new ObjectId(app.jobId));
-      
+
       // Step 3: Get those jobs from jobs collection
       const jobs = await jobCollection.find({ _id: { $in: jobIds } }).toArray();
 
@@ -84,12 +84,16 @@ async function run() {
           applicationId: application?._id, // optional for withdraw
         };
       });
-      
 
       res.send(enriched);
     });
-
-  
+    app.delete("/applications/:id", async (req, res) => {
+      const applicationId = req.params.id;
+      const result = await applicationCollection.deleteOne({
+        _id: new ObjectId(applicationId),
+      });
+      res.send(result);
+    });
 
     // app.delete("/applications/:id", async (req, res) => {
     //     const id = req.params.id;
