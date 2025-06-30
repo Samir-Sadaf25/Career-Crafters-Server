@@ -15,7 +15,8 @@ app.listen(port, () => {
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vvycnhh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -65,7 +66,6 @@ async function run() {
       const applications = await applicationCollection
         .find({ userId })
         .toArray();
-      console.log(applications);
 
       // Step 2: Extract all jobIds from them
       const jobIds = applications.map((app) => new ObjectId(app.jobId));
@@ -116,6 +116,21 @@ async function run() {
       } catch (error) {
         console.error("Failed to add job:", err);
         res.status(500).send({ error: "Internal server error" });
+      }
+    });
+
+    app.get("/my-jobs", async (req, res) => {
+      const userId = req.query.userId;
+
+      if (!userId) {
+        return res.status(400).send({ error: "Missing userId" });
+      }
+
+      try {
+        const jobs = await jobCollection.find({ userId }).toArray();
+        res.send(jobs);
+      } catch (err) {
+        res.status(500).send({ error: "Failed to fetch jobs" });
       }
     });
   } finally {
